@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Daily Bread — Messages</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Malayalam:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <!-- Mobile & PWA -->
+  <meta name="theme-color" content="#2E4A3E">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+
+  <!-- Create/Edit Slide Panel -->
+  <div class="slide-panel-backdrop" id="msg-panel-backdrop"></div>
+  <div class="slide-panel" id="msg-panel" role="dialog" aria-modal="true" aria-labelledby="panel-title">
+    <div class="slide-panel-header">
+      <h2 class="slide-panel-title" id="panel-title" data-i18n="createMessage">Create Message</h2>
+      <button class="slide-panel-close" id="panel-close" aria-label="Close">✕</button>
+    </div>
+    <div class="slide-panel-body">
+      <form id="msg-form">
+        <div class="form-group">
+          <label class="form-label" for="msg-title">
+            <span data-i18n="title">Title</span>
+            <span style="font-size:0.75rem;color:var(--text-muted);margin-left:6px" data-i18n="titleOptional">Optional</span>
+          </label>
+          <input class="form-input" type="text" id="msg-title" maxlength="200">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="msg-content">
+            <span data-i18n="content">Content</span>
+            <span class="form-required">*</span>
+          </label>
+          <textarea class="form-textarea" id="msg-content" rows="6" maxlength="10000" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="msg-reference">
+            <span data-i18n="bibleReference">Bible Reference</span>
+          </label>
+          <input class="form-input" type="text" id="msg-reference" placeholder="e.g. Psalm 46:10" maxlength="200">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="msg-image-url">
+            <span data-i18n="imageUrl">Image URL</span>
+          </label>
+          <input class="form-input" type="url" id="msg-image-url" placeholder="https://..." maxlength="500">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" data-i18n="contentLang">Content Language</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="language" id="lang-en" value="en" checked>
+              <span data-i18n="english">English</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="language" id="lang-ml" value="ml">
+              <span data-i18n="malayalam">Malayalam</span>
+            </label>
+          </div>
+          <!-- Hidden select that JS reads -->
+          <select id="msg-language" style="display:none">
+            <option value="en">English</option>
+            <option value="ml">Malayalam</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <div class="toggle-wrap">
+            <label class="toggle">
+              <input type="checkbox" id="publish-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label" data-i18n="publishNow">Publish Now</span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="slide-panel-footer">
+      <button class="btn btn-ghost" onclick="window.closePanel()">Cancel</button>
+      <button class="btn btn-primary" id="panel-save-btn" type="submit" form="msg-form" data-i18n="save">Save</button>
+    </div>
+  </div>
+
+  <div class="admin-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">🍞 <span data-i18n="appName">Daily Bread</span> <span class="sidebar-badge" data-i18n="adminBadge">Admin</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html"><span class="nav-icon">📊</span> <span data-i18n="dashboard">Dashboard</span></a>
+        <a href="messages.html" class="active"><span class="nav-icon">📖</span> <span data-i18n="messages">Messages</span></a>
+        <a href="counselling.html"><span class="nav-icon">🕊️</span> <span data-i18n="counsellingRequests">Counselling Requests</span><span class="nav-badge" id="counselling-badge" style="display:none"></span></a>
+        <a href="prayer.html"><span class="nav-icon">🙏</span> <span data-i18n="prayerSettings">Prayer Settings</span></a>
+        <div class="nav-divider"></div>
+        <a href="#" onclick="window.switchLanguage('en');return false;"><span class="nav-icon">🌐</span> English</a>
+        <a href="#" onclick="window.switchLanguage('ml');return false;"><span class="nav-icon">🌐</span> മലയാളം</a>
+      </nav>
+    </aside>
+
+    <div class="main-content">
+      <header class="top-header">
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu"><span></span><span></span><span></span></button>
+        <h1 data-i18n="messages">Messages</h1>
+        <button class="btn btn-primary btn-sm" id="create-msg-btn" data-i18n="createMessage">+ Create Message</button>
+      </header>
+
+      <div class="page-body">
+        <div class="card">
+          <ul class="msg-list" id="messages-list">
+            <li style="padding:20px;text-align:center;color:var(--text-muted)">Loading...</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Sync radio buttons with hidden select
+    document.querySelectorAll('input[name="language"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.getElementById('msg-language').value = radio.value;
+      });
+    });
+    // Sync hidden select back to radios on panel open
+    window.closePanel = function() {
+      import('./js/app.js').then(({ closeSlidePanel }) => closeSlidePanel('msg-panel'));
+    };
+  </script>
+  <script type="module" src="js/messages.js"></script>
+</body>
+</html>

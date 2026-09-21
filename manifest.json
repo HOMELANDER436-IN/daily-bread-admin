@@ -1,0 +1,25 @@
+{
+  "name": "Daily Bread — Admin Portal",
+  "short_name": "Daily Bread Admin",
+  "description": "Admin console for Daily Bread — publish messages, review counselling, manage prayer notifications.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FAF9F6",
+  "theme_color": "#2E4A3E",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

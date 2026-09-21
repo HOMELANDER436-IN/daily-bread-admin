@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Daily Bread — Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Malayalam:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <!-- Mobile & PWA -->
+  <meta name="theme-color" content="#2E4A3E">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          🍞 <span data-i18n="appName">Daily Bread</span>
+          <span class="sidebar-badge" data-i18n="adminBadge">Admin</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="active"><span class="nav-icon">📊</span> <span data-i18n="dashboard">Dashboard</span></a>
+        <a href="messages.html"><span class="nav-icon">📖</span> <span data-i18n="messages">Messages</span></a>
+        <a href="counselling.html">
+          <span class="nav-icon">🕊️</span>
+          <span data-i18n="counsellingRequests">Counselling Requests</span>
+          <span class="nav-badge" id="counselling-badge" style="display:none"></span>
+        </a>
+        <a href="prayer.html"><span class="nav-icon">🙏</span> <span data-i18n="prayerSettings">Prayer Settings</span></a>
+        <div class="nav-divider"></div>
+        <a href="#" onclick="window.switchLanguage('en');return false;"><span class="nav-icon">🌐</span> English</a>
+        <a href="#" onclick="window.switchLanguage('ml');return false;"><span class="nav-icon">🌐</span> മലയാളം</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <header class="top-header">
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+        <h1 data-i18n="dashboard">Dashboard</h1>
+        <div></div>
+      </header>
+
+      <div class="page-body">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <!-- Today's Message -->
+          <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-label" data-i18n="todayMessage">Today's Message</div>
+            <div id="msg-stat">
+              <div class="skeleton skeleton-line w-80" style="height:14px;margin-bottom:8px"></div>
+              <div class="skeleton skeleton-line w-60" style="height:14px"></div>
+            </div>
+          </div>
+
+          <!-- Counselling -->
+          <div class="stat-card">
+            <div class="stat-icon">🕊️</div>
+            <div class="stat-label" data-i18n="unreadRequests">Unread Requests</div>
+            <div class="stat-value" id="counselling-unread">—</div>
+            <div class="stat-sub">
+              <span data-i18n="totalRequests">Total</span>: <span id="counselling-total">—</span>
+            </div>
+          </div>
+
+          <!-- Prayer -->
+          <div class="stat-card">
+            <div class="stat-icon">🙏</div>
+            <div class="stat-label" data-i18n="prayerReminder">Prayer Reminder</div>
+            <div class="stat-value" id="prayer-time-stat">—</div>
+            <div class="stat-sub" id="prayer-status-stat">—</div>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Quick Actions</h2>
+          </div>
+          <div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap">
+            <a href="messages.html" class="btn btn-primary">📝 New Message</a>
+            <a href="counselling.html" class="btn btn-outline">🕊️ View Requests</a>
+            <a href="prayer.html" class="btn btn-outline">🙏 Prayer Settings</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
