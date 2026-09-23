@@ -98,9 +98,14 @@ window.editMessage = async function (id) {
   document.getElementById('msg-title').value = msg.title || '';
   document.getElementById('msg-content').value = msg.content || '';
   document.getElementById('msg-reference').value = msg.reference || '';
-  document.getElementById('msg-image-url').value = msg.image_url || '';
   document.getElementById('msg-language').value = msg.language || 'en';
   document.getElementById('publish-toggle').checked = msg.is_published;
+
+  // Sync visible radio buttons to match the message's stored language
+  const lang = msg.language || 'en';
+  document.querySelectorAll('input[name="language"]').forEach(radio => {
+    radio.checked = radio.value === lang;
+  });
 
   openSlidePanel('msg-panel');
 };
@@ -154,7 +159,6 @@ async function handleSave(e) {
     title:      document.getElementById('msg-title')?.value.trim() || null,
     content,
     reference:  document.getElementById('msg-reference')?.value.trim() || null,
-    image_url:  document.getElementById('msg-image-url')?.value.trim() || null,
     language:   document.getElementById('msg-language')?.value || 'en',
     is_published: document.getElementById('publish-toggle')?.checked || false,
   };
