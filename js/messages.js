@@ -219,5 +219,6 @@ function closePanel() {
   editingId = null;
   document.getElementById('msg-form')?.reset();
 }
+window.closePanel = closePanel;
 
 document.addEventListener('DOMContentLoaded', init);
