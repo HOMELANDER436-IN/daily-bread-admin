@@ -2,8 +2,8 @@
  * Daily Bread — Admin App — Counselling Controller
  */
 
-import { initAdminApp, showToast, formatDate, escapeHtml } from './app.js';
-import { getCounselling, getCounsellingItem, markCounsellingViewed } from './api.js';
+import { initAdminApp, showToast, showConfirmDialog, formatDate, escapeHtml } from './app.js';
+import { getCounselling, getCounsellingItem, markCounsellingViewed, deleteCounsellingItem, deleteAllCounselling } from './api.js';
 import { t, getLang } from './i18n.js';
 
 let currentFilter = 'all';
@@ -13,7 +13,33 @@ let selectedItemId = null;
 async function init() {
   initAdminApp({ loadUnreadBadge: true });
   setupFilters();
+  setupDeleteAll();
   await loadCounselling();
+}
+
+function setupDeleteAll() {
+  const deleteAllBtn = document.getElementById('delete-all-counselling-btn');
+  deleteAllBtn?.addEventListener('click', handleDeleteAllCounselling);
+}
+
+function handleDeleteAllCounselling() {
+  showConfirmDialog({
+    title: t('deleteAllRequests'),
+    message: t('confirmDeleteAllRequests'),
+    confirmText: t('deleteAll'),
+    dangerous: true,
+    onConfirm: async () => {
+      try {
+        await deleteAllCounselling();
+        showToast(t('deleteAllRequests'), 'success');
+        window.closeDetail();
+        currentPage = 1;
+        await loadCounselling();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    },
+  });
 }
 
 function setupFilters() {
@@ -34,16 +60,20 @@ async function loadCounselling() {
 
   try {
     const data = await getCounselling(currentFilter, currentPage);
-    renderList(data.requests || []);
+    renderList(data.requests || [], data.total || 0);
     renderPagination(data.total, data.page, data.limit);
   } catch (err) {
     list.innerHTML = `<li style="padding:20px;color:var(--error)">${err.message}</li>`;
   }
 }
 
-function renderList(items) {
+function renderList(items, total = 0) {
   const list = document.getElementById('counselling-list');
   const lang = getLang();
+  const deleteAllBtn = document.getElementById('delete-all-counselling-btn');
+  if (deleteAllBtn) {
+    deleteAllBtn.style.display = total > 0 || items.length > 0 ? 'inline-flex' : 'none';
+  }
 
   if (!items.length) {
     list.innerHTML = `
@@ -70,6 +100,9 @@ function renderList(items) {
         <div class="counselling-item-phone">📞 ${escapeHtml(item.contact_number)}</div>
         ${item.comment ? `<div class="counselling-item-preview">${escapeHtml(item.comment)}</div>` : ''}
         <div class="counselling-item-date">${formatDate(item.created_at, lang)}</div>
+      </div>
+      <div class="counselling-item-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-ghost btn-sm" onclick="window.handleDeleteCounselling('${item.id}')" title="${t('deleteRequest')}" style="color:var(--error)">🗑️</button>
       </div>
     </li>
   `).join('');
@@ -158,9 +191,33 @@ function renderDetail(item) {
       <button class="btn btn-primary" onclick="window.markViewed('${item.id}')" style="margin-top:8px">
         ✓ ${t('markViewed')}
       </button>` : ''}
+      <button class="btn btn-danger btn-sm" onclick="window.handleDeleteCounselling('${item.id}')" style="margin-top:12px">
+        🗑️ ${t('deleteRequest')}
+      </button>
     </div>
   `;
 }
+
+window.handleDeleteCounselling = function (id) {
+  showConfirmDialog({
+    title: t('deleteRequest'),
+    message: t('confirmDeleteRequest'),
+    confirmText: t('delete'),
+    dangerous: true,
+    onConfirm: async () => {
+      try {
+        await deleteCounsellingItem(id);
+        showToast(t('deleteRequest'), 'success');
+        if (selectedItemId === id) {
+          window.closeDetail();
+        }
+        await loadCounselling();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    },
+  });
+};
 
 window.closeDetail = function () {
   document.getElementById('detail-backdrop')?.classList.remove('open');

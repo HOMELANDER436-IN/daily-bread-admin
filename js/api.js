@@ -5,7 +5,7 @@
 
 import { BASE_URL } from './config.js';
 
-const TIMEOUT_MS = 12000;
+const TIMEOUT_MS = 60000; // 60 seconds (allows for Render free tier cold-start wakeup)
 
 class ApiError extends Error {
   constructor(message, status) {
@@ -45,7 +45,7 @@ async function apiFetch(path, options = {}) {
     return data;
   } catch (err) {
     clearTimeout(timeoutId);
-    if (err.name === 'AbortError') throw new ApiError('Request timed out.', 0);
+    if (err.name === 'AbortError') throw new ApiError('Request timed out. The server was waking up, please retry.', 0);
     if (err instanceof ApiError) throw err;
     throw new ApiError('Unable to connect to server.', 0);
   }
@@ -97,6 +97,11 @@ export async function deleteMessage(id) {
   await apiFetch(`/api/admin/messages/${id}`, { method: 'DELETE' });
 }
 
+export async function deleteAllMessages() {
+  const res = await apiFetch('/api/admin/messages/all', { method: 'DELETE' });
+  return res.data;
+}
+
 export async function togglePublish(id, isPublished) {
   const res = await apiFetch(`/api/admin/messages/${id}/publish`, {
     method: 'PATCH',
@@ -118,6 +123,16 @@ export async function getCounsellingItem(id) {
 
 export async function markCounsellingViewed(id) {
   const res = await apiFetch(`/api/admin/counselling/${id}/viewed`, { method: 'PATCH' });
+  return res.data;
+}
+
+export async function deleteCounsellingItem(id) {
+  const res = await apiFetch(`/api/admin/counselling/${id}`, { method: 'DELETE' });
+  return res.data;
+}
+
+export async function deleteAllCounselling() {
+  const res = await apiFetch('/api/admin/counselling/all', { method: 'DELETE' });
   return res.data;
 }
 

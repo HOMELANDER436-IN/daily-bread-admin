@@ -54,12 +54,6 @@
           <input class="form-input" type="text" id="msg-reference" placeholder="e.g. Psalm 46:10" maxlength="200">
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="msg-image-url">
-            <span data-i18n="imageUrl">Image URL</span>
-          </label>
-          <input class="form-input" type="url" id="msg-image-url" placeholder="https://..." maxlength="500">
-        </div>
 
         <div class="form-group">
           <label class="form-label" data-i18n="contentLang">Content Language</label>
@@ -117,7 +111,10 @@
       <header class="top-header">
         <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu"><span></span><span></span><span></span></button>
         <h1 data-i18n="messages">Messages</h1>
-        <button class="btn btn-primary btn-sm" id="create-msg-btn" data-i18n="createMessage">+ Create Message</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-danger btn-sm" id="delete-all-btn" style="display:none" data-i18n="deleteAll">Delete All</button>
+          <button class="btn btn-primary btn-sm" id="create-msg-btn" data-i18n="createMessage">+ Create Message</button>
+        </div>
       </header>
 
       <div class="page-body">

@@ -3,7 +3,7 @@
  */
 
 import { initAdminApp, showToast, showConfirmDialog, openSlidePanel, closeSlidePanel, formatDate, escapeHtml } from './app.js';
-import { getMessages, createMessage, updateMessage, deleteMessage, togglePublish } from './api.js';
+import { getMessages, createMessage, updateMessage, deleteMessage, deleteAllMessages, togglePublish } from './api.js';
 import { t, getLang } from './i18n.js';
 
 let allMessages = [];
@@ -12,7 +12,33 @@ let editingId = null;
 async function init() {
   initAdminApp({ loadUnreadBadge: true });
   setupPanel();
+  setupDeleteAll();
   await loadMessages();
+}
+
+function setupDeleteAll() {
+  const deleteAllBtn = document.getElementById('delete-all-btn');
+  deleteAllBtn?.addEventListener('click', handleDeleteAllMessages);
+}
+
+function handleDeleteAllMessages() {
+  if (!allMessages.length) return;
+  showConfirmDialog({
+    title: t('deleteAllMessages'),
+    message: t('confirmDeleteAllMessages'),
+    confirmText: t('deleteAll'),
+    dangerous: true,
+    onConfirm: async () => {
+      try {
+        await deleteAllMessages();
+        allMessages = [];
+        renderMessages(allMessages);
+        showToast(t('deleteAllMessages'), 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    },
+  });
 }
 
 async function loadMessages() {
@@ -30,6 +56,10 @@ async function loadMessages() {
 function renderMessages(messages) {
   const list = document.getElementById('messages-list');
   const lang = getLang();
+  const deleteAllBtn = document.getElementById('delete-all-btn');
+  if (deleteAllBtn) {
+    deleteAllBtn.style.display = messages.length ? 'inline-flex' : 'none';
+  }
 
   if (!messages.length) {
     list.innerHTML = `
