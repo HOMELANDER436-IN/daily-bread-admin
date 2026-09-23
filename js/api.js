@@ -155,4 +155,44 @@ export async function updatePrayerSettings(data) {
   return res.data;
 }
 
+// ─── Multiple Prayer Schedules ────────────────────────────────
+export async function getPrayerSchedules() {
+  const res = await apiFetch('/api/admin/prayer-schedules');
+  return res.data || [];
+}
+
+export async function getPrayerSchedule(id) {
+  const res = await apiFetch(`/api/admin/prayer-schedules/${id}`);
+  return res.data;
+}
+
+export async function createPrayerSchedule(data) {
+  const res = await apiFetch('/api/admin/prayer-schedules', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  return res.data;
+}
+
+export async function updatePrayerSchedule(id, data) {
+  const res = await apiFetch(`/api/admin/prayer-schedules/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+  return res.data;
+}
+
+export async function deletePrayerSchedule(id) {
+  const res = await apiFetch(`/api/admin/prayer-schedules/${id}`, { method: 'DELETE' });
+  return res.data;
+}
+
+export async function togglePrayerSchedule(id, enabled) {
+  const res = await apiFetch(`/api/admin/prayer-schedules/${id}/toggle`, {
+    method: 'PATCH',
+    body: JSON.stringify({ enabled }),
+  });
+  return res.data;
+}
+
 export { ApiError };

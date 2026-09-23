@@ -2,7 +2,7 @@
  * Daily Bread — Admin App — Counselling Controller
  */
 
-import { initAdminApp, showToast, showConfirmDialog, formatDate, escapeHtml } from './app.js';
+import { initAdminApp, showToast, showConfirmDialog, formatDate, formatDateTime, escapeHtml } from './app.js';
 import { getCounselling, getCounsellingItem, markCounsellingViewed, deleteCounsellingItem, deleteAllCounselling } from './api.js';
 import { t, getLang } from './i18n.js';
 
@@ -99,7 +99,7 @@ function renderList(items, total = 0) {
         <div class="counselling-item-name">${escapeHtml(item.full_name)}</div>
         <div class="counselling-item-phone">📞 ${escapeHtml(item.contact_number)}</div>
         ${item.comment ? `<div class="counselling-item-preview">${escapeHtml(item.comment)}</div>` : ''}
-        <div class="counselling-item-date">${formatDate(item.created_at, lang)}</div>
+        <div class="counselling-item-date">${formatDateTime(item.created_at, lang)}</div>
       </div>
       <div class="counselling-item-actions" onclick="event.stopPropagation()">
         <button class="btn btn-ghost btn-sm" onclick="window.handleDeleteCounselling('${item.id}')" title="${t('deleteRequest')}" style="color:var(--error)">🗑️</button>
@@ -177,14 +177,14 @@ function renderDetail(item) {
       </div>` : ''}
       <div class="detail-field">
         <div class="detail-label">${t('submitted')}</div>
-        <div class="detail-value">${formatDate(item.created_at, lang)}</div>
+        <div class="detail-value">${formatDateTime(item.created_at, lang)}</div>
       </div>
       <div class="detail-field">
         <div class="detail-label">${t('status')}</div>
         <div class="detail-value">
           <span class="status-dot ${item.is_viewed ? 'viewed' : 'unread'}" style="vertical-align:middle;margin-right:8px"></span>
           ${item.is_viewed ? t('viewed') : t('unread')}
-          ${item.viewed_at ? `<span style="font-size:0.75rem;color:var(--text-light);margin-left:8px">${formatDate(item.viewed_at, lang)}</span>` : ''}
+          ${item.viewed_at ? `<span style="font-size:0.75rem;color:var(--text-light);margin-left:8px">${formatDateTime(item.viewed_at, lang)}</span>` : ''}
         </div>
       </div>
       ${!item.is_viewed ? `

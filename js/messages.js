@@ -2,7 +2,7 @@
  * Daily Bread — Admin App — Messages Controller
  */
 
-import { initAdminApp, showToast, showConfirmDialog, openSlidePanel, closeSlidePanel, formatDate, escapeHtml } from './app.js';
+import { initAdminApp, showToast, showConfirmDialog, openSlidePanel, closeSlidePanel, formatDate, formatDateTime, escapeHtml } from './app.js';
 import { getMessages, createMessage, updateMessage, deleteMessage, deleteAllMessages, togglePublish } from './api.js';
 import { t, getLang } from './i18n.js';
 
@@ -83,7 +83,7 @@ function renderMessages(messages) {
           <span class="badge ${msg.language === 'ml' ? 'badge-ml' : 'badge-en'}">
             ${msg.language === 'ml' ? 'ML' : 'EN'}
           </span>
-          <span style="font-size:0.75rem;color:var(--text-light)">${formatDate(msg.created_at, lang)}</span>
+          <span style="font-size:0.75rem;color:var(--text-light)">${formatDateTime(msg.created_at, lang)}</span>
         </div>
       </div>
       <div class="msg-item-actions">

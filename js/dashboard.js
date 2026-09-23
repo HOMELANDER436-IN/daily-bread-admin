@@ -2,7 +2,7 @@
  * Daily Bread — Admin App — Dashboard Controller
  */
 
-import { initAdminApp, showToast, formatDate } from './app.js';
+import { initAdminApp, showToast, formatDate, formatTime } from './app.js';
 import { getDashboardData } from './api.js';
 import { t } from './i18n.js';
 
@@ -56,7 +56,7 @@ function renderCounsellingStat(counts) {
 function renderPrayerStat(settings) {
   const timeEl   = document.getElementById('prayer-time-stat');
   const statusEl = document.getElementById('prayer-status-stat');
-  if (timeEl)   timeEl.textContent   = settings?.prayer_time || '—';
+  if (timeEl)   timeEl.textContent = settings?.prayer_time ? formatTime(settings.prayer_time) : '—';
   if (statusEl) {
     statusEl.textContent = settings?.enabled ? t('enabled') : t('disabled');
     statusEl.className = `stat-sub ${settings?.enabled ? 'stat-ok' : ''}`;

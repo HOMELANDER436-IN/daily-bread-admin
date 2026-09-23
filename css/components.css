@@ -270,3 +270,45 @@
 .page-btn:hover { border-color: var(--primary); color: var(--primary); }
 .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── Schedule Cards & 12-Hour Picker ────────────────────────── */
+.schedule-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.schedule-card {
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.schedule-card:hover { border-color: var(--border); box-shadow: var(--shadow-sm); }
+.schedule-card.disabled { opacity: 0.6; background: var(--bg-alt); }
+.schedule-info { flex: 1; min-width: 0; }
+.schedule-time { font-size: 1.35rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+.schedule-type { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+.schedule-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+.days-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.day-chip {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: white;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.day-chip:hover { border-color: var(--primary); color: var(--primary); }
+.day-chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+.time-picker-12 { display: flex; align-items: center; gap: 8px; max-width: 260px; }
+.time-select { padding: 9px 12px; font-size: 1rem; font-weight: 600; }
+.time-sep { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }

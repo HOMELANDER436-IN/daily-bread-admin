@@ -144,14 +144,131 @@ export function closeSlidePanel(id) {
   document.body.style.overflow = '';
 }
 
-/** Format a date string */
-export function formatDate(dateStr, lang = 'en') {
-  if (!dateStr) return '—';
+/**
+ * Robustly parses any timestamp input (Firestore object, seconds, ISO string, Date).
+ * Returns a valid Date object, or null if invalid.
+ */
+export function parseTimestamp(ts) {
+  if (!ts) return null;
+  if (ts instanceof Date) {
+    return isNaN(ts.getTime()) ? null : ts;
+  }
+  if (typeof ts.toMillis === 'function') {
+    const d = new Date(ts.toMillis());
+    return isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof ts === 'object') {
+    const sec = ts._seconds ?? ts.seconds;
+    if (typeof sec === 'number') {
+      const d = new Date(sec * 1000);
+      return isNaN(d.getTime()) ? null : d;
+    }
+  }
+  if (typeof ts === 'number') {
+    const d = new Date(ts < 1e11 ? ts * 1000 : ts);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof ts === 'string') {
+    const trimmed = ts.trim();
+    if (!trimmed) return null;
+    const d = new Date(trimmed);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  return null;
+}
+
+/**
+ * Format a date cleanly without ever showing Invalid Date.
+ */
+export function formatDate(dateInput, lang = 'en', fallback = '—') {
+  const date = parseTimestamp(dateInput);
+  if (!date) return fallback;
+
   try {
-    return new Date(dateStr).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-IN', {
-      day: 'numeric', month: 'long', year: 'numeric',
+    const locale = lang === 'ml' ? 'ml-IN' : 'en-IN';
+    const formatted = date.toLocaleDateString(locale, {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
     });
-  } catch { return dateStr; }
+    if (!formatted || formatted.toLowerCase().includes('invalid')) {
+      return fallback;
+    }
+    return formatted;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Format a time into strict 12-hour format with AM/PM (e.g. 9:00 PM).
+ * Never exposes 24-hour time to the user.
+ */
+export function formatTime(timeOrTs, lang = 'en', fallback = '—') {
+  if (!timeOrTs) return fallback;
+
+  if (typeof timeOrTs === 'string' && timeOrTs.includes(':')) {
+    const parts = timeOrTs.trim().split(':');
+    let h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    if (!isNaN(h) && !isNaN(m)) {
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12;
+      if (h === 0) h = 12;
+      const minStr = String(m).padStart(2, '0');
+      return `${h}:${minStr} ${ampm}`;
+    }
+  }
+
+  const date = parseTimestamp(timeOrTs);
+  if (!date) return fallback;
+
+  try {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
+    const minStr = String(minutes).padStart(2, '0');
+    return `${hours}:${minStr} ${ampm}`;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Formats date and 12-hour time together.
+ */
+export function formatDateTime(dateInput, lang = 'en', fallback = '—') {
+  const dStr = formatDate(dateInput, lang, '');
+  const tStr = formatTime(dateInput, lang, '');
+  if (dStr && tStr) return `${dStr}, ${tStr}`;
+  return dStr || tStr || fallback;
+}
+
+/**
+ * Converts 24-hr "HH:MM" into { hour12, minute, ampm } for 12-hour inputs.
+ */
+export function format12Hour(hhmm = '21:00') {
+  const parts = String(hhmm).split(':');
+  let h = parseInt(parts[0], 10) || 0;
+  const m = String(parseInt(parts[1], 10) || 0).padStart(2, '0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  if (h === 0) h = 12;
+  return { hour12: String(h).padStart(2, '0'), minute: m, ampm };
+}
+
+/**
+ * Converts 12-hour { hour12, minute, ampm } to 24-hr "HH:MM" for backend storage.
+ */
+export function to24Hour(hour12, minute, ampm) {
+  let h = parseInt(hour12, 10) || 12;
+  const m = String(parseInt(minute, 10) || 0).padStart(2, '0');
+  const isPM = String(ampm).toUpperCase() === 'PM';
+  if (isPM && h < 12) h += 12;
+  if (!isPM && h === 12) h = 0;
+  return `${String(h).padStart(2, '0')}:${m}`;
 }
 
 /** Escape HTML */

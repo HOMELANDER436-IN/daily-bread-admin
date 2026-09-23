@@ -46,58 +46,192 @@
       </header>
 
       <div class="page-body">
-        <div class="card" style="max-width:520px">
-          <div class="card-header">
-            <h2 data-i18n="dailyPrayer">Daily Prayer</h2>
+        <div style="display:flex;flex-direction:column;gap:24px;max-width:680px">
+
+          <!-- Master Toggle Card -->
+          <div class="card">
+            <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <h2 data-i18n="masterPrayerSettings">Master Prayer Reminder</h2>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px" data-i18n="timezoneNote">All notifications scheduled in Asia/Kolkata timezone.</div>
+              </div>
+              <div class="toggle-wrap" style="margin:0">
+                <label class="toggle">
+                  <input type="checkbox" id="prayer-enabled-toggle">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="card-body" style="padding-top:8px">
+              <div class="form-hint" id="prayer-status-msg" style="margin:0;font-size:0.88rem"></div>
+            </div>
           </div>
-          <div class="card-body">
-            <form id="prayer-settings-form">
 
-              <!-- Large time display -->
-              <div style="text-align:center;padding:16px 0 24px">
-                <div style="font-size:0.8rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px" data-i18n="prayerTime">Prayer reminder time</div>
-                <div class="prayer-time-display" id="prayer-time-display">21:00</div>
+          <!-- Multiple Schedules Card -->
+          <div class="card">
+            <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <h2 data-i18n="prayerSchedules">Prayer Schedules</h2>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">Configure multiple times, daily routines, or specific days.</div>
               </div>
+              <button class="btn btn-primary btn-sm" id="add-schedule-btn">
+                <span style="font-size:1.1rem;line-height:1;margin-right:4px">+</span> <span data-i18n="addSchedule">Add Schedule</span>
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="schedule-list" id="schedules-list"></div>
 
-              <!-- Time Picker -->
-              <div class="form-group">
-                <label class="form-label" for="prayer-time-input">Time (HH:MM, 24-hour format)</label>
-                <input
-                  class="form-input"
-                  type="time"
-                  id="prayer-time-input"
-                  name="prayer_time"
-                  value="21:00"
-                  required
-                  style="max-width:180px;font-size:1.1rem"
-                >
-                <div class="form-hint">The server uses Asia/Kolkata timezone for all scheduling.</div>
+              <div class="empty-state" id="schedules-empty" style="display:none">
+                <div class="empty-icon">🙏</div>
+                <p data-i18n="noSchedules">No prayer schedules configured yet.</p>
               </div>
+            </div>
+          </div>
 
-              <!-- Enable/Disable Toggle -->
-              <div class="form-group" style="margin-top:20px">
-                <div class="toggle-wrap">
-                  <label class="toggle">
-                    <input type="checkbox" id="prayer-enabled-toggle" name="enabled">
-                    <span class="toggle-slider"></span>
-                  </label>
-                  <span class="toggle-label" data-i18n="prayerReminder">Prayer Reminder</span>
+          <!-- Notification Preview Card -->
+          <div class="card">
+            <div class="card-header">
+              <h2>Notification Preview & Sound</h2>
+            </div>
+            <div class="card-body">
+              <div style="background:var(--bg);border-radius:var(--radius-sm);padding:18px;border:1px solid var(--border-light)">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                  <div style="font-weight:700;font-size:0.95rem;color:var(--text)">🍞 Daily Bread</div>
+                  <span class="badge badge-published" style="font-size:0.72rem">Push Notification</span>
                 </div>
-                <div class="form-hint" id="prayer-status-msg" style="margin-top:10px"></div>
+                <div style="font-size:0.9rem;color:var(--text-muted);line-height:1.5">It is prayer time. Take a moment to pray.</div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-light);font-size:0.78rem;color:var(--text-light)">
+                  <span>🔔 <strong style="color:var(--text-muted)">Sound:</strong> Church Bell (church_bell.mp3)</span>
+                  <span>•</span>
+                  <span>⏳ <strong style="color:var(--text-muted)">Banner Duration:</strong> 2 Hours</span>
+                </div>
               </div>
-
-              <!-- What will be sent -->
-              <div style="background:var(--bg);border-radius:var(--radius-sm);padding:16px;margin:16px 0;border:1px solid var(--border-light)">
-                <div style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Notification Preview</div>
-                <div style="font-weight:600;font-size:0.9rem">🍞 Daily Bread</div>
-                <div style="font-size:0.85rem;color:var(--text-muted);margin-top:4px">It is prayer time. Take a moment to pray.</div>
-                <div style="font-size:0.75rem;color:var(--text-light);margin-top:8px">Prayer banner visible in viewer app for 2 hours after send.</div>
+              <div class="form-hint" style="margin-top:12px">
+                Configured as the custom FCM notification sound for Web Push, Android, and iOS devices.
               </div>
+            </div>
+          </div>
 
-              <button class="btn btn-primary" type="submit" id="save-prayer-btn" data-i18n="saveSettings">Save Settings</button>
-            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide Panel: Add / Edit Schedule -->
+  <div class="slide-panel-backdrop" id="schedule-panel-backdrop"></div>
+  <div class="slide-panel" id="schedule-panel">
+    <div class="slide-panel-header">
+      <h3 class="slide-panel-title" id="schedule-panel-title" data-i18n="addSchedule">Add Schedule</h3>
+      <button class="btn btn-ghost slide-panel-close" id="schedule-panel-close" aria-label="Close">✕</button>
+    </div>
+    <div class="slide-panel-body">
+      <form id="schedule-form">
+        <input type="hidden" id="sched-id">
+
+        <!-- 12-Hour Time Picker -->
+        <div class="form-group">
+          <label class="form-label" data-i18n="time">Time (12-hour format)</label>
+          <div class="time-picker-12">
+            <select id="sched-hour" class="form-input time-select" aria-label="Hour">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9" selected>9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+            </select>
+            <span class="time-sep">:</span>
+            <select id="sched-minute" class="form-input time-select" aria-label="Minute">
+              <option value="00" selected>00</option>
+              <option value="05">05</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="25">25</option>
+              <option value="30">30</option>
+              <option value="35">35</option>
+              <option value="40">40</option>
+              <option value="45">45</option>
+              <option value="50">50</option>
+              <option value="55">55</option>
+            </select>
+            <select id="sched-period" class="form-input time-select" aria-label="AM or PM">
+              <option value="AM">AM</option>
+              <option value="PM" selected>PM</option>
+            </select>
+          </div>
+          <div class="form-hint" id="sched-time-preview" style="font-weight:600;color:var(--primary);margin-top:6px">Selected: 9:00 PM</div>
+        </div>
+
+        <!-- Repeat Type -->
+        <div class="form-group">
+          <label class="form-label" for="sched-type" data-i18n="repeat">Repeat</label>
+          <select id="sched-type" class="form-input">
+            <option value="daily" data-i18n="everyDay">Every Day</option>
+            <option value="weekly" data-i18n="selectedDays">Selected Days of Week</option>
+            <option value="once" data-i18n="once">Once</option>
+          </select>
+        </div>
+
+        <!-- Days Selection (when weekly) -->
+        <div class="form-group" id="sched-days-wrap" style="display:none">
+          <label class="form-label" data-i18n="selectDays">Select Days</label>
+          <div class="days-chips" id="sched-days-chips">
+            <button type="button" class="day-chip active" data-day="0">S</button>
+            <button type="button" class="day-chip active" data-day="1">M</button>
+            <button type="button" class="day-chip active" data-day="2">T</button>
+            <button type="button" class="day-chip active" data-day="3">W</button>
+            <button type="button" class="day-chip active" data-day="4">T</button>
+            <button type="button" class="day-chip active" data-day="5">F</button>
+            <button type="button" class="day-chip active" data-day="6">S</button>
+          </div>
+          <div class="form-hint">Click on days to toggle them.</div>
+        </div>
+
+        <!-- Specific Date (when once) -->
+        <div class="form-group" id="sched-date-wrap" style="display:none">
+          <label class="form-label" for="sched-date" data-i18n="date">Date</label>
+          <input type="date" id="sched-date" class="form-input" style="max-width:220px">
+        </div>
+
+        <!-- Optional Label -->
+        <div class="form-group">
+          <label class="form-label" for="sched-label" data-i18n="label">Description / Label</label>
+          <input type="text" id="sched-label" class="form-input" placeholder="e.g. Evening Intercession (optional)" maxlength="100">
+        </div>
+
+        <!-- Enable Switch -->
+        <div class="form-group" style="margin-top:16px">
+          <div class="toggle-wrap">
+            <label class="toggle">
+              <input type="checkbox" id="sched-enabled" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label" data-i18n="enableSchedule">Enable this schedule</span>
           </div>
         </div>
+      </form>
+    </div>
+    <div class="slide-panel-footer">
+      <button type="button" class="btn btn-secondary" id="schedule-cancel-btn" data-i18n="cancel">Cancel</button>
+      <button type="submit" form="schedule-form" class="btn btn-primary" id="schedule-save-btn" data-i18n="save">Save</button>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Dialog -->
+  <div class="dialog-backdrop" id="delete-dialog-backdrop">
+    <div class="dialog" id="delete-dialog">
+      <h3 data-i18n="deleteSchedule">Delete Prayer Schedule</h3>
+      <p data-i18n="confirmDeleteSchedule">Are you sure you want to delete this prayer schedule?</p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="cancel-delete-btn" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-danger" id="confirm-delete-btn" data-i18n="delete">Delete</button>
       </div>
     </div>
   </div>
