@@ -12,13 +12,25 @@ let editingId = null;
 async function init() {
   initAdminApp({ loadUnreadBadge: true });
   setupPanel();
-  setupDeleteAll();
+  setupButtons();
   await loadMessages();
 }
 
-function setupDeleteAll() {
-  const deleteAllBtn = document.getElementById('delete-all-btn');
-  deleteAllBtn?.addEventListener('click', handleDeleteAllMessages);
+function setupButtons() {
+  // Mobile action bar — "Create Message" button
+  document.getElementById('create-msg-btn')?.addEventListener('click', openCreatePanel);
+
+  // Desktop header — "Create Message" button
+  document.getElementById('create-msg-btn-desktop')?.addEventListener('click', openCreatePanel);
+
+  // FAB (floating action button, mobile only)
+  document.getElementById('fab-create-btn')?.addEventListener('click', openCreatePanel);
+
+  // Mobile action bar — "Delete All" button
+  document.getElementById('delete-all-btn')?.addEventListener('click', handleDeleteAllMessages);
+
+  // Desktop header — "Delete All" button
+  document.getElementById('delete-all-btn-desktop')?.addEventListener('click', handleDeleteAllMessages);
 }
 
 function handleDeleteAllMessages() {
@@ -43,7 +55,7 @@ function handleDeleteAllMessages() {
 
 async function loadMessages() {
   const list = document.getElementById('messages-list');
-  list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted)">Loading...</div>`;
+  list.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted)">Loading...</div>`;
 
   try {
     allMessages = await getMessages();
@@ -53,13 +65,19 @@ async function loadMessages() {
   }
 }
 
+function setDeleteAllVisible(visible) {
+  // Update both mobile action bar and desktop header delete buttons
+  const mobile = document.getElementById('delete-all-btn');
+  const desktop = document.getElementById('delete-all-btn-desktop');
+  const show = visible ? 'inline-flex' : 'none';
+  if (mobile)  mobile.style.display  = show;
+  if (desktop) desktop.style.display = show;
+}
+
 function renderMessages(messages) {
   const list = document.getElementById('messages-list');
   const lang = getLang();
-  const deleteAllBtn = document.getElementById('delete-all-btn');
-  if (deleteAllBtn) {
-    deleteAllBtn.style.display = messages.length ? 'inline-flex' : 'none';
-  }
+  setDeleteAllVisible(messages.length > 0);
 
   if (!messages.length) {
     list.innerHTML = `
@@ -71,42 +89,46 @@ function renderMessages(messages) {
     return;
   }
 
-  list.innerHTML = messages.map(msg => `
-    <li class="msg-item" id="msg-${msg.id}">
-      <div class="msg-item-body">
-        <div class="msg-item-title">${escapeHtml(msg.title || msg.content?.substring(0, 50) + '...')}</div>
-        <div class="msg-item-preview">${escapeHtml(msg.content?.substring(0, 80))}...</div>
-        <div class="msg-item-meta">
+  list.innerHTML = messages.map(msg => {
+    const publishLabel = msg.is_published ? '🔒 Unpublish' : '🌐 Publish';
+    const publishClass = msg.is_published ? 'unpublish' : 'publish';
+    return `
+    <div class="msg-card" id="msg-${msg.id}">
+      <div class="msg-card-body">
+        <div class="msg-card-title">${escapeHtml(msg.title || msg.content?.substring(0, 60) + '...')}</div>
+        <div class="msg-card-preview">${escapeHtml(msg.content?.substring(0, 120))}...</div>
+        <div class="msg-card-meta">
           <span class="badge ${msg.is_published ? 'badge-published' : 'badge-draft'}">
             ${msg.is_published ? '✓ ' + t('published') : t('draft')}
           </span>
           <span class="badge ${msg.language === 'ml' ? 'badge-ml' : 'badge-en'}">
             ${msg.language === 'ml' ? 'ML' : 'EN'}
           </span>
-          <span style="font-size:0.75rem;color:var(--text-light)">${formatDateTime(msg.created_at, lang)}</span>
+          <span class="msg-card-date">${formatDateTime(msg.created_at, lang)}</span>
         </div>
       </div>
-      <div class="msg-item-actions">
-        <button class="btn btn-ghost btn-sm" onclick="window.editMessage('${msg.id}')" title="Edit">✏️</button>
-        <button class="btn btn-ghost btn-sm" onclick="window.handleTogglePublish('${msg.id}', ${!msg.is_published})" title="${msg.is_published ? t('unpublish') : t('publish')}">
-          ${msg.is_published ? '🔒' : '🌐'}
+      <div class="msg-card-actions">
+        <button class="msg-card-action-btn" onclick="window.editMessage('${msg.id}')" title="Edit">
+          ✏️ Edit
         </button>
-        <button class="btn btn-ghost btn-sm" onclick="window.handleDeleteMessage('${msg.id}')" title="${t('deleteMessage')}" style="color:var(--error)">🗑️</button>
+        <button class="msg-card-action-btn ${publishClass}" onclick="window.handleTogglePublish('${msg.id}', ${!msg.is_published})" title="${msg.is_published ? t('unpublish') : t('publish')}">
+          ${publishLabel}
+        </button>
+        <button class="msg-card-action-btn delete" onclick="window.handleDeleteMessage('${msg.id}')" title="${t('deleteMessage')}">
+          🗑️ Delete
+        </button>
       </div>
-    </li>
-  `).join('');
+    </div>
+  `;
+  }).join('');
 }
 
 function setupPanel() {
-  // Create backdrop
-  const panelEl = document.getElementById('msg-panel');
   const backdropEl = document.getElementById('msg-panel-backdrop');
-
   backdropEl?.addEventListener('click', (e) => {
     if (e.target === backdropEl) closePanel();
   });
   document.getElementById('panel-close')?.addEventListener('click', closePanel);
-  document.getElementById('create-msg-btn')?.addEventListener('click', () => openCreatePanel());
   document.getElementById('msg-form')?.addEventListener('submit', handleSave);
 }
 
@@ -115,6 +137,11 @@ function openCreatePanel() {
   document.getElementById('panel-title').textContent = t('createMessage');
   document.getElementById('msg-form')?.reset();
   document.getElementById('publish-toggle').checked = false;
+  // Reset radio buttons to English
+  document.querySelectorAll('input[name="language"]').forEach(r => {
+    r.checked = r.value === 'en';
+  });
+  document.getElementById('msg-language').value = 'en';
   openSlidePanel('msg-panel');
 }
 
@@ -131,7 +158,7 @@ window.editMessage = async function (id) {
   document.getElementById('msg-language').value = msg.language || 'en';
   document.getElementById('publish-toggle').checked = msg.is_published;
 
-  // Sync visible radio buttons to match the message's stored language
+  // Sync visible radio buttons
   const lang = msg.language || 'en';
   document.querySelectorAll('input[name="language"]').forEach(radio => {
     radio.checked = radio.value === lang;
@@ -153,7 +180,6 @@ window.handleTogglePublish = async function (id, publish) {
 };
 
 window.handleDeleteMessage = function (id) {
-  const msg = allMessages.find(m => m.id === id);
   showConfirmDialog({
     title: t('confirmDelete'),
     message: t('confirmDeleteMsg'),
@@ -186,10 +212,10 @@ async function handleSave(e) {
   saveBtn.innerHTML = `<span class="spinner"></span> ${t('saving')}`;
 
   const payload = {
-    title:      document.getElementById('msg-title')?.value.trim() || null,
+    title:        document.getElementById('msg-title')?.value.trim() || null,
     content,
-    reference:  document.getElementById('msg-reference')?.value.trim() || null,
-    language:   document.getElementById('msg-language')?.value || 'en',
+    reference:    document.getElementById('msg-reference')?.value.trim() || null,
+    language:     document.getElementById('msg-language')?.value || 'en',
     is_published: document.getElementById('publish-toggle')?.checked || false,
   };
 

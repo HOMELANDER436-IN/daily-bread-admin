@@ -120,6 +120,13 @@ a { color: var(--primary); text-decoration: none; }
 .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); }
 .sidebar-footer .admin-email { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; word-break: break-all; }
 
+/* ─── Mobile action bar: hidden on desktop (desktop uses header buttons) ── */
+@media (min-width: 769px) {
+  .msg-action-bar { display: none !important; }
+  .fab { display: none !important; }
+}
+
+
 /* ─── Main Content ───────────────────────────────────────────── */
 .main-content {
   margin-left: var(--sidebar-w);
@@ -249,6 +256,8 @@ button, a, input, select, textarea {
 
 /* ─── Responsive — Tablet (≤ 768px) ─────────────────────────── */
 @media (max-width: 768px) {
+  /* Hide desktop header action buttons — mobile uses action bar + FAB */
+  .msg-header-actions-desktop { display: none !important; }
   /* Sidebar becomes a slide-out drawer */
   .sidebar {
     transform: translateX(-100%);
