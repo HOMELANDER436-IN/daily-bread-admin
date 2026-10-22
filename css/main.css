@@ -238,19 +238,145 @@ a { color: var(--primary); text-decoration: none; }
 }
 @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-/* ─── Responsive ─────────────────────────────────────────────── */
+/* ─── Touch Improvements (all devices) ───────────────────────── */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+/* Smooth momentum scrolling on iOS */
+.sidebar, .main-content, .slide-panel, .page-body {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Responsive — Tablet (≤ 768px) ─────────────────────────── */
 @media (max-width: 768px) {
+  /* Sidebar becomes a slide-out drawer */
   .sidebar {
     transform: translateX(-100%);
+    box-shadow: none;
   }
   .sidebar.open {
     transform: translateX(0);
     box-shadow: var(--shadow-lg);
   }
-  .drawer-overlay { display: block; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+  /* Drawer overlay visible and interactive when sidebar is open */
+  .drawer-overlay {
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
   .drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+  /* Main content fills full width */
   .main-content { margin-left: 0; }
+
+  /* Show hamburger button */
   .hamburger-btn { display: flex; }
-  .page-body { padding: 16px; }
-  .top-header { padding: 0 16px; }
+
+  /* Increase hamburger hit target */
+  .hamburger-btn {
+    width: 48px; height: 48px;
+    gap: 5px;
+  }
+
+  /* Tighter page padding */
+  .page-body {
+    padding: 14px 12px;
+    max-width: 100% !important;
+  }
+  .top-header {
+    padding: 0 12px;
+    height: 56px;
+  }
+  .top-header h1 { font-size: 1.05rem; }
+
+  /* Stats grid: 2-column on tablet */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  /* Smaller stat cards */
+  .stat-card { padding: 14px; }
+  .stat-value { font-size: 1.35rem; }
+
+  /* Card header wraps on narrow screens */
+  .card-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+  .card-body { padding: 14px 16px; }
+
+  /* Schedule cards stack info and actions */
+  .schedule-card {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Form rows go single column */
+  .form-row { grid-template-columns: 1fr; gap: 0; }
+
+  /* Slide panel full width on mobile */
+  .slide-panel { max-width: 100%; }
+
+  /* Larger touch targets for interactive elements */
+  .btn { min-height: 44px; }
+  .form-input, .form-textarea, .form-select {
+    min-height: 48px;
+    font-size: 1rem; /* Prevents iOS zoom on focus */
+  }
+  .day-chip { width: 40px; height: 40px; }
+
+  /* Time picker wraps gracefully */
+  .time-picker-12 { flex-wrap: wrap; gap: 6px; max-width: 100%; }
+  .time-select { flex: 1; min-width: 70px; }
+
+  /* Dialog full-width on mobile */
+  .dialog-backdrop { padding: 16px; }
+  .dialog { padding: 20px 16px; }
+
+  /* Filter tabs scroll horizontally */
+  .filter-tabs { overflow-x: auto; width: 100%; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .filter-tabs::-webkit-scrollbar { display: none; }
+
+  /* Messages list: tighten padding */
+  .msg-item { padding: 12px 14px; gap: 10px; }
+  .counselling-item { padding: 12px 14px; }
+
+  /* Pagination buttons easier to tap */
+  .page-btn { padding: 9px 14px; min-height: 40px; }
 }
+
+/* ─── Responsive — Small Phones (≤ 480px) ───────────────────── */
+@media (max-width: 480px) {
+  /* Single column stats */
+  .stats-grid { grid-template-columns: 1fr; }
+
+  /* Full-bleed cards */
+  .card { border-radius: var(--radius-sm); }
+
+  /* Tighter schedule card */
+  .schedule-card { padding: 12px 14px; }
+  .schedule-time { font-size: 1.15rem; }
+
+  /* Action buttons stack vertically */
+  .schedule-actions { width: 100%; justify-content: flex-end; }
+
+  /* Slide panel footer stack */
+  .slide-panel-footer { flex-direction: column-reverse; }
+  .slide-panel-footer .btn { width: 100%; justify-content: center; }
+
+  /* Message list items wrap actions below */
+  .msg-item { flex-direction: column; gap: 8px; }
+  .msg-item-actions { width: 100%; justify-content: flex-end; }
+
+  /* Smaller prayer time display */
+  .prayer-time-display { font-size: 2.2rem; }
+
+  /* Bottom safe-area for notched phones */
+  .main-content { padding-bottom: env(safe-area-inset-bottom, 0); }
+  .slide-panel-footer { padding-bottom: calc(16px + env(safe-area-inset-bottom, 0)); }
+}
+
